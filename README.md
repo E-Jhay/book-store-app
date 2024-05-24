@@ -11,6 +11,8 @@ Book Store is a simple crud application that manages books. It is made with VILT
 - Open your .env file and change the database name (DB_DATABASE) to whatever you have, username (DB_USERNAME) and password (DB_PASSWORD) field correspond to your configuration. the default of this is sqlite
 - Run php artisan key:generate.
 - Run php artisan migrate.
+- Run npm run install.
 - Run php artisan db:seed.
 - Run php artisan serve.
+- Run npm run dev.
 - Go to http://localhost:8000/.
