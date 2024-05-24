@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BooksExport;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BookController extends Controller
 {
@@ -118,8 +121,6 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        // dd($request->validated());
-        // dd($request->validated());
         $validatedData = $request->validated();
 
         if ($request->hasFile('cover')) {
@@ -127,6 +128,7 @@ class BookController extends Controller
             $validatedData['cover'] = $filePath;
         }
 
+        // check if cover is set will then delete the current cover
         if ($request->hasFile('cover')) {
             if ($book->cover) {
                 Storage::disk('public')->delete($book->cover);
@@ -153,5 +155,12 @@ class BookController extends Controller
 
         return to_route('books.index')
             ->with('success', 'Book Deleted Successfully.');
+    }
+
+    public function export()
+    {
+        return Excel::download(new BooksExport, 'books.csv', \Maatwebsite\Excel\Excel::CSV, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 }
