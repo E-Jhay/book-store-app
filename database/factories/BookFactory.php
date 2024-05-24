@@ -20,7 +20,7 @@ class BookFactory extends Factory
         return [
             'author_id' => Author::inRandomOrder()->first()->id,
             'name' => fake()->name(),
-            'cover' => fake()->image(storage_path('app/public/images'), 50, 50),
+            'cover' => 'images/placeholder.png',
         ];
     }
 }
