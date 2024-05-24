@@ -1,98 +1,94 @@
 <script setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
     show: {
         type: Boolean,
         default: false,
     },
-    maxWidth: {
-        type: String,
-        default: '2xl',
+    book: {
+        type: Object,
     },
-    closeable: {
-        type: Boolean,
-        default: true,
+    onClose: {
+        type: Function,
+        required: true,
     },
+    
 });
-
-const emit = defineEmits(['close']);
-
-watch(
-    () => props.show,
-    () => {
-        if (props.show) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = null;
-        }
-    }
-);
 
 const close = () => {
-    if (props.closeable) {
-        emit('close');
-    }
+    props.onClose();
 };
 
-const closeOnEscape = (e) => {
-    if (e.key === 'Escape' && props.show) {
-        close();
-    }
-};
-
-onMounted(() => document.addEventListener('keydown', closeOnEscape));
-
-onUnmounted(() => {
-    document.removeEventListener('keydown', closeOnEscape);
-    document.body.style.overflow = null;
-});
-
-const maxWidthClass = computed(() => {
-    return {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
-    }[props.maxWidth];
-});
 </script>
 
 <template>
-    <teleport to="body">
-        <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" scroll-region>
-                <transition
-                    enter-active-class="ease-out duration-300"
-                    enter-from-class="opacity-0"
-                    enter-to-class="opacity-100"
-                    leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100"
-                    leave-to-class="opacity-0"
-                >
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-500 opacity-75" />
-                    </div>
-                </transition>
+    
 
-                <transition
-                    enter-active-class="ease-out duration-300"
-                    enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-                    leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100 translate-y-0 sm:scale-100"
-                    leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                    <div
-                        v-show="show"
-                        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass"
-                    >
-                        <slot v-if="show" />
+    <div v-show="show" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <!--
+    Background backdrop, show/hide based on modal state.
+
+    Entering: "ease-out duration-300"
+      From: "opacity-0"
+      To: "opacity-100"
+    Leaving: "ease-in duration-200"
+      From: "opacity-100"
+      To: "opacity-0"
+  -->
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <!--
+        Modal panel, show/hide based on modal state.
+
+        Entering: "ease-out duration-300"
+          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          To: "opacity-100 translate-y-0 sm:scale-100"
+        Leaving: "ease-in duration-200"
+          From: "opacity-100 translate-y-0 sm:scale-100"
+          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      -->
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="w-full mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+              <h3 class="text-xl font-semibold leading-6 text-gray-900" id="modal-title">Book Details</h3>
+              <div class="mt-2">
+                <div class="flex items-center justify-center mb-4">
+                    <div>
+                        <div class="flex items-center justify-center mb-4">
+                            <img :src="book.cover" :alt="book.name" class="h-24 w-24 rounded-2xl">
+                        </div>
+                        <div class="md:col-span-1 mb-2">
+                            <h3 class="font-semibold text-gray-800 dark:text-gray-200 leading-tight">
+                                Book Name:
+                                <span class="font-normal">
+                                    {{ book.name }}
+                                </span>
+                            </h3>
+                        </div>
+                        <div class="md:col-span-1 mb-2">
+                            <h3 class="font-semibold text-gray-800 dark:text-gray-200 leading-tight">
+                                Authors Name:
+                                <span class="font-normal">
+                                    {{ book.author }}
+                                </span>
+                            </h3>
+                        </div>
                     </div>
-                </transition>
+                </div>
+              </div>
             </div>
-        </transition>
-    </teleport>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button @click.prevent="close" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </template>
