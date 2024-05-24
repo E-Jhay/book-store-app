@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Exports\BooksExport;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use App\Imports\BooksImport;
 use App\Models\Author;
 use App\Models\Book;
+use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -162,5 +163,21 @@ class BookController extends Controller
         return Excel::download(new BooksExport, 'books.csv', \Maatwebsite\Excel\Excel::CSV, [
             'Content-Type' => 'text/csv',
         ]);
+    }
+
+    public function import(HttpRequest $request)
+    {
+        $request->validate([
+            'books' => 'required|mimes:csv,txt',
+        ]);
+
+        Excel::import(new BooksImport, $request->file('books'));
+
+        return redirect()->back()->with('success', 'Books imported successfully.');
+    }
+
+    public function importBooks()
+    {
+        return inertia('Book/ImportBooks');
     }
 }

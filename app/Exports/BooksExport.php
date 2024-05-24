@@ -18,8 +18,8 @@ class BooksExport implements FromCollection, WithHeadings
                 ->map(function($book) {
                     return [
                         'name' => $book->name,
-                        'author' => $book->author->name,
-                        'cover' => "/storage/{$book->cover}",
+                        'author_id' => $book->author_id,
+                        'cover' => "{$book->cover}",
                     ];
                 });
     }
@@ -27,9 +27,9 @@ class BooksExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'Book Name',
-            'Author',
-            'Cover Path',
+            'name',
+            'author_id',
+            'cover',
         ];
     }
 }
