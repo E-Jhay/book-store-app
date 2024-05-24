@@ -171,6 +171,15 @@ class BookController extends Controller
             'books' => 'required|mimes:csv,txt',
         ]);
 
+        
+        // Get the number of rows in the file
+        // $rowCount = $this->getRowCount($request->file('books'));
+
+        // // Check if the row count is less than 500
+        // if ($rowCount < 500) {
+        //     return redirect()->back()->with('error', 'The file must contain at least 500 rows.');
+        // }
+
         Excel::import(new BooksImport, $request->file('books'));
 
         return redirect()->back()->with('success', 'Books imported successfully.');
@@ -180,4 +189,11 @@ class BookController extends Controller
     {
         return inertia('Book/ImportBooks');
     }
+
+    // private function getRowCount($file)
+    // {
+    //     // Load the file and count the number of rows
+    //     $rows = Excel::toArray([], $file);
+    //     return count($rows[0]);
+    // }
 }
