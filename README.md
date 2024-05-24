@@ -2,7 +2,7 @@
 
 Book Store is a simple crud application that manages books. It is made with VILT stack.
 
-## Learning Laravel
+## Installation
 
 - clone the app.
 - Go to the folder application using cd command on your cmd or terminal.
